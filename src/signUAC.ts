@@ -28,13 +28,23 @@ export interface UserActionChallengeSignOptions {
   externalAuthenticationUrl?: string;
 }
 
-function toBase64Url(buffer: Buffer): string {
-  return buffer.toString("base64url");
-}
+export const toBase64Url = (buffer: string | Buffer): string => {
+  return Buffer.from(buffer)
+    .toString("base64")
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+};
 
-function toHex(buffer: ArrayBuffer): string {
-  return Buffer.from(buffer).toString("hex");
-}
+export const toHex = (buffer: ArrayBuffer): string => {
+  const view = new Uint8Array(buffer);
+  let hexString = "";
+  for (const byte of view) {
+    const hexByte = byte.toString(16);
+    hexString += hexByte.padStart(2, "0");
+  }
+  return hexString.toLowerCase();
+};
 
 async function sha256(data: Uint8Array): Promise<ArrayBuffer> {
   return crypto.subtle.digest("SHA-256", data);
@@ -46,46 +56,43 @@ async function exportPublicKeyPem(key: CryptoKey): Promise<string> {
   return `-----BEGIN PUBLIC KEY-----\n${base64}\n-----END PUBLIC KEY-----\n`;
 }
 
-function rawSignatureToAns1(signature: ArrayBuffer): string {
-  const r = new Uint8Array(signature.slice(0, 32));
-  const s = new Uint8Array(signature.slice(32));
-
-  // Convert to ASN.1 DER format
-  const rNeedsLeadingZero = r[0] & 0x80;
-  const sNeedsLeadingZero = s[0] & 0x80;
-
-  // Calculate lengths
-  const rContentLen = rNeedsLeadingZero ? 33 : 32;
-  const sContentLen = sNeedsLeadingZero ? 33 : 32;
-  const rTotalLen = rContentLen + 2; // +2 for 0x02 and length byte
-  const sTotalLen = sContentLen + 2; // +2 for 0x02 and length byte
-  const totalLen = rTotalLen + sTotalLen + 2; // +2 for sequence header
-
-  const der = new Uint8Array(totalLen);
-  let offset = 0;
-
-  // Sequence header
-  der[offset++] = 0x30;
-  der[offset++] = totalLen - 2;
-
-  // R value
-  der[offset++] = 0x02;
-  der[offset++] = rContentLen;
-  if (rNeedsLeadingZero) {
-    der[offset++] = 0x00;
+function minimizeBigInt(value: Uint8Array): Uint8Array {
+  if (value.length === 0) {
+    return value;
   }
-  der.set(r, offset);
-  offset += 32;
-
-  // S value
-  der[offset++] = 0x02;
-  der[offset++] = sContentLen;
-  if (sNeedsLeadingZero) {
-    der[offset++] = 0x00;
+  const minValue = [0, ...value];
+  for (let i = 0; i < minValue.length; ++i) {
+    if (minValue[i] === 0) {
+      continue;
+    }
+    if (minValue[i] > 0x7f) {
+      return new Uint8Array(minValue.slice(i - 1));
+    }
+    return new Uint8Array(minValue.slice(i));
   }
-  der.set(s, offset);
+  return new Uint8Array([0]);
+}
+function rawSignatureToAns1(rawSignature: Uint8Array): Uint8Array {
+  if (rawSignature.length !== 64) {
+    console.log(rawSignature.length);
+    return new Uint8Array([0]);
+  }
+  const r = rawSignature.slice(0, 32);
+  const s = rawSignature.slice(32);
 
-  return toHex(der);
+  const minR = minimizeBigInt(r);
+  const minS = minimizeBigInt(s);
+
+  return new Uint8Array([
+    0x30,
+    minR.length + minS.length + 4,
+    0x02,
+    minR.length,
+    ...minR,
+    0x02,
+    minS.length,
+    ...minS,
+  ]);
 }
 
 export async function signChallenge(
@@ -97,56 +104,39 @@ export async function signChallenge(
   credentialInfo: {
     credId: string;
     clientData: string;
-    attestationData: string;
+    signature: string;
   };
 }> {
-  // Create client data with sorted keys
+  // Validate credId
+  if (!credId) {
+    throw new Error("credId is required for signing");
+  }
+
+  // Create client data
   const clientData = {
-    challenge: options.challenge,
     type: "key.get",
+    challenge: options.challenge,
   };
 
-  // Stringify client data with specific format
+  // Stringify client data
   const clientDataJson = JSON.stringify(clientData);
-  const clientDataBuffer = new TextEncoder().encode(clientDataJson);
-  const clientDataHash = await sha256(clientDataBuffer);
-  const clientDataHashHex = toHex(clientDataHash);
 
-  // Create credential info fingerprint
-  const publicKeyPem = await exportPublicKeyPem(keyPair.publicKey);
-  const credentialInfoFingerprint = {
-    clientDataHash: clientDataHashHex,
-    publicKey: publicKeyPem,
-  };
-
-  // Stringify credential info fingerprint with specific format
-  const fingerprintJson = JSON.stringify(credentialInfoFingerprint);
-  const fingerprintBuffer = new TextEncoder().encode(fingerprintJson);
-
-  // Sign the fingerprint
+  // Sign the client data directly
   const signature = await crypto.subtle.sign(
     { name: "ECDSA", hash: { name: "SHA-256" } },
     keyPair.privateKey,
-    fingerprintBuffer
+    new TextEncoder().encode(clientDataJson)
   );
 
   // Convert signature to ASN.1 DER format
-  const signatureHex = rawSignatureToAns1(signature);
-
-  // Create attestation data object
-  const attestationData = {
-    publicKey: publicKeyPem,
-    signature: signatureHex,
-  };
+  const signatureHex = rawSignatureToAns1(new Uint8Array(signature));
 
   return {
     credentialKind: "Key",
     credentialInfo: {
       credId,
       clientData: toBase64Url(Buffer.from(clientDataJson)),
-      attestationData: toBase64Url(
-        Buffer.from(JSON.stringify(attestationData))
-      ),
+      signature: toBase64Url(Buffer.from(signatureHex)),
     },
   };
 }
