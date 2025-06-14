@@ -47,8 +47,8 @@ node dist/index.js
 
 - `src/` - Source TypeScript files
   - `index.ts` - Main entry point
-  - `signCreate.ts` - Signing implementation for credential challenge
-  - `signUAC.ts` - Signing implementation for user action challenge
+  - `signCreateCredChallenge.ts` - Signing implementation for credential challenge
+  - `signUserActionChallenge.ts` - Signing implementation for user action challenge
   - `keyManager.ts` - Key pair management
 - `dist/` - Compiled JavaScript files (created after build)
 
