@@ -1,0 +1,26 @@
+{
+    "attestation": "direct",
+    "challenge": "Y2gtNDMxcTUtYWtscG8tOTBncWdnZWozN25mbHY2cw",
+    "challengeIdentifier": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJpc3MiOiJhdXRoLmRmbnMubmluamEiLCJhdWQiOiJkZm5zOmF1dGg6dXNlciIsInN1YiI6Im9yLTRmcDNiLTRvY2thLThpZGJtZmwxZmtidjh0cTUiLCJqdGkiOiJ1ai0zbzdzNS03dDN2aS04anBvb2RwMWhyNmM4cDZzIiwiaHR0cHM6Ly9jdXN0b20vdXNlcm5hbWUiOiJzYXNhK2FiY0Bjb2luc3ViLmlvIiwiaHR0cHM6Ly9jdXN0b20vYXBwX21ldGFkYXRhIjp7InVzZXJJZCI6InVzLWVxb2M5LWg0cHI5LW5hYXVxaGs3OHQ5bzBqbyIsIm9yZ0lkIjoib3ItNGZwM2ItNG9ja2EtOGlkYm1mbDFma2J2OHRxNSIsInRva2VuS2luZCI6IlRlbXAiLCJjaGFsbGVuZ2UiOiJZMmd0TkRNeGNUVXRZV3RzY0c4dE9UQm5jV2RuWldvek4yNW1iSFkyY3ciLCJjaGFsbGVuZ2VJbmZvIjp7fX0sImlhdCI6MTc0OTkwMTYyNiwiZXhwIjoxNzQ5OTAyNTI2fQ.S9q8cITUmX1VYlzO7ttbtBZoqZ_XlJa3f-rVOpoGInPwaZoEHF0c_i6xP8UQ5Y32kcKeN68yPOXupGo-aQXRDg",
+    "kind": "Key",
+    "pubKeyCredParams": [
+        {
+            "alg": -257,
+            "type": "public-key"
+        },
+        {
+            "alg": -7,
+            "type": "public-key"
+        }
+    ],
+    "rp": {
+        "id": "dfns.ninja",
+        "name": "Dfns"
+    },
+    "temporaryAuthenticationToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJpc3MiOiJhdXRoLmRmbnMubmluamEiLCJhdWQiOiJkZm5zOmF1dGg6dXNlciIsInN1YiI6Im9yLTRmcDNiLTRvY2thLThpZGJtZmwxZmtidjh0cTUiLCJqdGkiOiJ1ai0zbzdzNS03dDN2aS04anBvb2RwMWhyNmM4cDZzIiwiaHR0cHM6Ly9jdXN0b20vdXNlcm5hbWUiOiJzYXNhK2FiY0Bjb2luc3ViLmlvIiwiaHR0cHM6Ly9jdXN0b20vYXBwX21ldGFkYXRhIjp7InVzZXJJZCI6InVzLWVxb2M5LWg0cHI5LW5hYXVxaGs3OHQ5bzBqbyIsIm9yZ0lkIjoib3ItNGZwM2ItNG9ja2EtOGlkYm1mbDFma2J2OHRxNSIsInRva2VuS2luZCI6IlRlbXAiLCJjaGFsbGVuZ2UiOiJZMmd0TkRNeGNUVXRZV3RzY0c4dE9UQm5jV2RuWldvek4yNW1iSFkyY3ciLCJjaGFsbGVuZ2VJbmZvIjp7fX0sImlhdCI6MTc0OTkwMTYyNiwiZXhwIjoxNzQ5OTAyNTI2fQ.S9q8cITUmX1VYlzO7ttbtBZoqZ_XlJa3f-rVOpoGInPwaZoEHF0c_i6xP8UQ5Y32kcKeN68yPOXupGo-aQXRDg",
+    "user": {
+        "displayName": "sasa+abc@coinsub.io (or-4fp3b-4ocka-8idbmfl1fkbv8tq5)",
+        "id": "us-eqoc9-h4pr9-naauqhk78t9o0jo",
+        "name": "sasa+abc@coinsub.io"
+    }
+}

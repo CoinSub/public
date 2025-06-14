@@ -85,7 +85,7 @@ function rawSignatureToAns1(signature: ArrayBuffer): string {
   return toHex(der);
 }
 
-export async function sign(
+export async function create(
   options: PublicKeyCredentialCreationOptions,
   keyPair: CryptoKeyPair
 ): Promise<{
